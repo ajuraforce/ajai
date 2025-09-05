@@ -1,0 +1,898 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trading Platform - Professional Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["Inter", "system-ui", "sans-serif"],
+                    mono: ["JetBrains Mono", "Fira Code", "monospace"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(222 84% 5%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222 47% 11%);
+            --card-foreground: hsl(210 40% 98%);
+            --popover: hsl(222 47% 11%);
+            --popover-foreground: hsl(210 40% 98%);
+            --primary: hsl(217 91% 60%);
+            --primary-foreground: hsl(222 84% 5%);
+            --secondary: hsl(222 47% 11%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217 19% 27%);
+            --muted-foreground: hsl(215 20% 65%);
+            --accent: hsl(217 91% 60%);
+            --accent-foreground: hsl(222 84% 5%);
+            --destructive: hsl(0 63% 31%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(217 19% 27%);
+            --input: hsl(217 19% 27%);
+            --ring: hsl(224 71% 4%);
+            --chart-1: hsl(173 58% 39%);
+            --chart-2: hsl(43 74% 66%);
+            --chart-3: hsl(197 37% 24%);
+            --chart-4: hsl(27 87% 67%);
+            --chart-5: hsl(6 78% 57%);
+            --radius: 0.75rem;
+            --font-sans: 'Inter';
+            --font-mono: 'JetBrains Mono';
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: var(--font-sans), system-ui, sans-serif;
+        }
+
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .number-font {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .gradient-border {
+            background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+                        linear-gradient(90deg, hsl(var(--primary)), hsl(var(--chart-1))) border-box;
+            border: 1px solid transparent;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-online {
+            background-color: hsl(var(--chart-1));
+            box-shadow: 0 0 8px hsla(var(--chart-1), 0.6);
+        }
+
+        .status-warning {
+            background-color: hsl(var(--chart-2));
+            box-shadow: 0 0 8px hsla(var(--chart-2), 0.6);
+        }
+
+        .status-offline {
+            background-color: hsl(var(--chart-5));
+            box-shadow: 0 0 8px hsla(var(--chart-5), 0.6);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/24/outline/index.css">
+</head>
+<body class="bg-background text-foreground min-h-screen">
+    <!-- @COMPONENT: TradingPlatformLayout -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <!-- @COMPONENT: Sidebar -->
+        <div class="w-64 bg-card border-r border-border flex flex-col">
+            <!-- Logo and Platform Status -->
+            <div class="p-6 border-b border-border">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-foreground">AI Trading</h1>
+                        <div class="flex items-center space-x-2">
+                            <span class="status-indicator status-online pulse-dot"></span>
+                            <span class="text-xs text-muted-foreground">Live Market</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v1H8V5z"/>
+                    </svg>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>Portfolio</span>
+                </a>
+                
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span>Signals</span>
+                    <span class="ml-auto bg-chart-1 text-background text-xs px-2 py-1 rounded-full font-medium number-font">3</span>
+                </a>
+                
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                    <span>News Feed</span>
+                </a>
+                
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Account Section -->
+            <div class="p-4 border-t border-border">
+                <div class="flex items-center space-x-3 p-3 rounded-lg bg-muted/20">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-xs font-semibold text-primary-foreground">AI</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium truncate" data-bind="user.name">Trading Bot</p>
+                        <p class="text-xs text-muted-foreground" data-bind="user.status">Active Session</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Header -->
+            <!-- @COMPONENT: TopHeader -->
+            <header class="bg-card border-b border-border px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-6">
+                        <h2 class="text-xl font-semibold">Trading Dashboard</h2>
+                        <div class="flex items-center space-x-4 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span class="status-indicator status-online"></span>
+                                <span class="text-muted-foreground">Market Open</span>
+                            </div>
+                            <div class="text-muted-foreground number-font" data-bind="currentTime">15:42:33 EST</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Real-time Status Indicators -->
+                        <div class="hidden md:flex items-center space-x-4 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="status-indicator status-online"></span>
+                                <span>OpenAI</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="status-indicator status-online"></span>
+                                <span>Market Data</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="status-indicator status-warning"></span>
+                                <span>News Feed</span>
+                            </div>
+                        </div>
+                        
+                        <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                            Emergency Stop
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: TopHeader -->
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-auto p-6">
+                <div class="max-w-full mx-auto space-y-6">
+                    <!-- Portfolio Overview Cards -->
+                    <!-- @COMPONENT: PortfolioOverview -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-card rounded-xl p-6 border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-muted-foreground">Total Portfolio</h3>
+                                <svg class="w-5 h-5 text-chart-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 001.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-2xl font-bold number-font" data-bind="portfolio.total">$127,543.22</div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-chart-1 text-sm font-medium">+$3,247.18</span>
+                                    <span class="text-chart-1 text-sm">(+2.61%)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card rounded-xl p-6 border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-muted-foreground">Active Positions</h3>
+                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-2xl font-bold number-font" data-bind="portfolio.activePositions">7</div>
+                                <div class="text-sm text-muted-foreground">5 profitable positions</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card rounded-xl p-6 border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-muted-foreground">AI Signals Today</h3>
+                                <svg class="w-5 h-5 text-chart-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-2xl font-bold number-font" data-bind="signals.todayCount">23</div>
+                                <div class="text-sm text-muted-foreground">18 buy • 5 sell</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card rounded-xl p-6 border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-muted-foreground">Win Rate</h3>
+                                <svg class="w-5 h-5 text-chart-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-2xl font-bold number-font" data-bind="portfolio.winRate">73.2%</div>
+                                <div class="text-sm text-muted-foreground">Last 30 days</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: PortfolioOverview -->
+
+                    <!-- Main Dashboard Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Trading Signals Panel -->
+                        <!-- @COMPONENT: TradingSignals -->
+                        <div class="lg:col-span-2 bg-card rounded-xl border border-border">
+                            <div class="p-6 border-b border-border">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold">Live Trading Signals</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="status-indicator status-online pulse-dot"></span>
+                                        <span class="text-sm text-muted-foreground">Real-time AI Analysis</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 space-y-4">
+                                <!-- @MAP: signals.map(signal => ( -->
+                                <div class="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:bg-muted/20 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-2 h-2 bg-chart-1 rounded-full pulse-dot"></div>
+                                        <div>
+                                            <div class="font-medium number-font" data-bind="signal.symbol">BTC/USD</div>
+                                            <div class="text-sm text-muted-foreground" data-bind="signal.timestamp">2 minutes ago</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="px-3 py-1 bg-chart-1/20 text-chart-1 rounded-full text-sm font-medium border border-chart-1/30">
+                                            <span data-bind="signal.action">BUY</span>
+                                        </div>
+                                        <div class="text-xs text-muted-foreground mt-1" data-bind="signal.confidence">92% confidence</div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="font-medium number-font" data-bind="signal.price">$43,247.50</div>
+                                        <div class="text-sm text-muted-foreground" data-bind="signal.target">Target: $45,200</div>
+                                    </div>
+                                    
+                                    <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:executeSignal">
+                                        Execute
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:bg-muted/20 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-2 h-2 bg-chart-5 rounded-full pulse-dot"></div>
+                                        <div>
+                                            <div class="font-medium number-font">ETH/USD</div>
+                                            <div class="text-sm text-muted-foreground">5 minutes ago</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="px-3 py-1 bg-chart-5/20 text-chart-5 rounded-full text-sm font-medium border border-chart-5/30">
+                                            SELL
+                                        </div>
+                                        <div class="text-xs text-muted-foreground mt-1">87% confidence</div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="font-medium number-font">$2,234.75</div>
+                                        <div class="text-sm text-muted-foreground">Target: $2,100</div>
+                                    </div>
+                                    
+                                    <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                        Execute
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:bg-muted/20 transition-colors">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-2 h-2 bg-chart-1 rounded-full pulse-dot"></div>
+                                        <div>
+                                            <div class="font-medium number-font">AAPL</div>
+                                            <div class="text-sm text-muted-foreground">8 minutes ago</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="px-3 py-1 bg-chart-1/20 text-chart-1 rounded-full text-sm font-medium border border-chart-1/30">
+                                            BUY
+                                        </div>
+                                        <div class="text-xs text-muted-foreground mt-1">94% confidence</div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="font-medium number-font">$187.42</div>
+                                        <div class="text-sm text-muted-foreground">Target: $195.00</div>
+                                    </div>
+                                    
+                                    <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                        Execute
+                                    </button>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: TradingSignals -->
+
+                        <!-- News Feed & Sentiment -->
+                        <!-- @COMPONENT: NewsFeed -->
+                        <div class="bg-card rounded-xl border border-border">
+                            <div class="p-6 border-b border-border">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold">Market News</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="text-sm text-muted-foreground">Live Feed</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6 space-y-4 max-h-96 overflow-y-auto">
+                                <!-- @MAP: news.map(article => ( -->
+                                <div class="border-b border-border pb-4 last:border-b-0">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-chart-1 rounded-full mt-2 flex-shrink-0"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium leading-snug mb-2" data-bind="article.title">
+                                                Federal Reserve Signals Potential Rate Cut Amid Economic Uncertainty
+                                            </h4>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs text-muted-foreground" data-bind="article.source">Reuters</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="px-2 py-1 bg-chart-1/20 text-chart-1 rounded text-xs font-medium" data-bind="article.sentiment">
+                                                        Bullish 0.73
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-muted-foreground leading-relaxed" data-bind="article.summary">
+                                                Market analysts predict significant impact on crypto and tech stocks following Fed announcement...
+                                            </p>
+                                            <div class="text-xs text-muted-foreground mt-2" data-bind="article.timestamp">3 minutes ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-b border-border pb-4 last:border-b-0">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-chart-5 rounded-full mt-2 flex-shrink-0"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium leading-snug mb-2">
+                                                Major Tech Earnings Miss Expectations, Stocks Tumble
+                                            </h4>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs text-muted-foreground">CNBC</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="px-2 py-1 bg-chart-5/20 text-chart-5 rounded text-xs font-medium">
+                                                        Bearish 0.68
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-muted-foreground leading-relaxed">
+                                                Tech giants report lower-than-expected quarterly results, triggering market-wide selloff...
+                                            </p>
+                                            <div class="text-xs text-muted-foreground mt-2">12 minutes ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-b border-border pb-4 last:border-b-0">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-chart-2 rounded-full mt-2 flex-shrink-0"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium leading-snug mb-2">
+                                                Bitcoin ETF Approval Rumors Drive Crypto Rally
+                                            </h4>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs text-muted-foreground">CoinDesk</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="px-2 py-1 bg-chart-2/20 text-chart-2 rounded text-xs font-medium">
+                                                        Neutral 0.45
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-muted-foreground leading-relaxed">
+                                                Speculation around SEC approval timeline continues to drive volatility in crypto markets...
+                                            </p>
+                                            <div class="text-xs text-muted-foreground mt-2">18 minutes ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: NewsFeed -->
+                    </div>
+
+                    <!-- Market Data & Performance Charts -->
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- Market Performance Chart -->
+                        <!-- @COMPONENT: MarketChart -->
+                        <div class="bg-card rounded-xl border border-border">
+                            <div class="p-6 border-b border-border">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold">Portfolio Performance</h3>
+                                    <div class="flex items-center space-x-2">
+                                        <button class="px-3 py-1 text-xs rounded-lg bg-primary/10 text-primary">1D</button>
+                                        <button class="px-3 py-1 text-xs rounded-lg text-muted-foreground hover:text-foreground">1W</button>
+                                        <button class="px-3 py-1 text-xs rounded-lg text-muted-foreground hover:text-foreground">1M</button>
+                                        <button class="px-3 py-1 text-xs rounded-lg text-muted-foreground hover:text-foreground">1Y</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <canvas id="portfolioChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: MarketChart -->
+
+                        <!-- Risk Analysis -->
+                        <!-- @COMPONENT: RiskAnalysis -->
+                        <div class="bg-card rounded-xl border border-border">
+                            <div class="p-6 border-b border-border">
+                                <h3 class="text-lg font-semibold">Risk Analysis</h3>
+                            </div>
+                            
+                            <div class="p-6 space-y-6">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-muted-foreground">Portfolio Risk</span>
+                                        <span class="text-sm font-medium text-chart-2" data-bind="risk.portfolio">Medium</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="bg-chart-2 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-muted-foreground">Diversification</span>
+                                        <span class="text-sm font-medium text-chart-1" data-bind="risk.diversification">Good</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="bg-chart-1 h-2 rounded-full" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-muted-foreground">Volatility</span>
+                                        <span class="text-sm font-medium text-chart-5" data-bind="risk.volatility">High</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="bg-chart-5 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-4 border-t border-border">
+                                    <h4 class="text-sm font-medium mb-3">Risk Recommendations</h4>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex items-start space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-chart-2 rounded-full mt-2 flex-shrink-0"></div>
+                                            <span class="text-muted-foreground">Consider reducing crypto exposure</span>
+                                        </div>
+                                        <div class="flex items-start space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-chart-1 rounded-full mt-2 flex-shrink-0"></div>
+                                            <span class="text-muted-foreground">Increase defensive positions</span>
+                                        </div>
+                                        <div class="flex items-start space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-chart-2 rounded-full mt-2 flex-shrink-0"></div>
+                                            <span class="text-muted-foreground">Set tighter stop-losses</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: RiskAnalysis -->
+                    </div>
+
+                    <!-- Current Positions Table -->
+                    <!-- @COMPONENT: PositionsTable -->
+                    <div class="bg-card rounded-xl border border-border">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Current Positions</h3>
+                                <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    View All
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-border">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Symbol</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Position</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Entry Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">P&L</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border">
+                                    <!-- @MAP: positions.map(position => ( -->
+                                    <tr data-bind="position.id" class="hover:bg-muted/20 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-primary" data-bind="position.symbolShort">BTC</span>
+                                                </div>
+                                                <span class="font-medium number-font" data-bind="position.symbol">BTC/USD</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-1 bg-chart-1/20 text-chart-1 rounded text-xs font-medium" data-bind="position.type">LONG</span>
+                                                <span class="text-sm number-font" data-bind="position.quantity">0.25</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font" data-bind="position.entryPrice">$41,250.00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font" data-bind="position.currentPrice">$43,247.50</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-chart-1 font-medium number-font" data-bind="position.pnl">+$499.38</span>
+                                                <span class="text-chart-1 text-sm" data-bind="position.pnlPercentage">(+4.84%)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <button class="px-3 py-1 bg-chart-5/20 text-chart-5 rounded text-xs font-medium hover:bg-chart-5/30 transition-colors" data-event="click:closePosition">
+                                                Close
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr class="hover:bg-muted/20 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-primary">ETH</span>
+                                                </div>
+                                                <span class="font-medium number-font">ETH/USD</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-1 bg-chart-5/20 text-chart-5 rounded text-xs font-medium">SHORT</span>
+                                                <span class="text-sm number-font">2.50</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font">$2,245.00</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font">$2,234.75</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-chart-1 font-medium number-font">+$25.63</span>
+                                                <span class="text-chart-1 text-sm">(+0.46%)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <button class="px-3 py-1 bg-chart-5/20 text-chart-5 rounded text-xs font-medium hover:bg-chart-5/30 transition-colors">
+                                                Close
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr class="hover:bg-muted/20 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-primary">AAPL</span>
+                                                </div>
+                                                <span class="font-medium number-font">AAPL</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-1 bg-chart-1/20 text-chart-1 rounded text-xs font-medium">LONG</span>
+                                                <span class="text-sm number-font">50</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font">$185.20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm number-font">$187.42</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-chart-1 font-medium number-font">+$111.00</span>
+                                                <span class="text-chart-1 text-sm">(+1.20%)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <button class="px-3 py-1 bg-chart-5/20 text-chart-5 rounded text-xs font-medium hover:bg-chart-5/30 transition-colors">
+                                                Close
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: PositionsTable -->
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: TradingPlatformLayout -->
+
+    <!-- Real-time Data Updates (WebSocket Simulation) -->
+    <script>
+        (function() {
+            // TODO: Implement WebSocket connection for real-time data
+            // TODO: Connect to market data service
+            // TODO: Connect to AI analysis service
+            
+            // Simulate real-time price updates
+            function simulateRealTimeUpdates() {
+                const priceElements = document.querySelectorAll('[data-bind*="price"]');
+                
+                setInterval(() => {
+                    priceElements.forEach(element => {
+                        if (element.textContent.includes('$')) {
+                            const currentPrice = parseFloat(element.textContent.replace(/[$,]/g, ''));
+                            const change = (Math.random() - 0.5) * currentPrice * 0.02; // ±2% change
+                            const newPrice = currentPrice + change;
+                            element.textContent = '$' + newPrice.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    });
+                }, 5000); // Update every 5 seconds
+            }
+
+            // Update timestamps
+            function updateTimestamps() {
+                const timeElements = document.querySelectorAll('[data-bind="currentTime"]');
+                setInterval(() => {
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('en-US', {
+                        hour12: false,
+                        timeZone: 'America/New_York'
+                    }) + ' EST';
+                    
+                    timeElements.forEach(element => {
+                        element.textContent = timeString;
+                    });
+                }, 1000);
+            }
+
+            // Initialize Chart.js portfolio performance chart
+            function initializeChart() {
+                const ctx = document.getElementById('portfolioChart');
+                if (!ctx) return;
+
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'],
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: [124296, 125180, 124890, 126240, 127100, 126800, 127350, 127543, 126990, 127200, 127890, 127200, 127543],
+                            borderColor: 'hsl(173 58% 39%)',
+                            backgroundColor: 'hsla(173 58% 39% / 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'hsl(217 19% 27%)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'hsl(215 20% 65%)',
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'hsl(217 19% 27%)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'hsl(215 20% 65%)',
+                                    font: {
+                                        size: 11
+                                    },
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                backgroundColor: 'hsl(173 58% 39%)',
+                                borderColor: 'hsl(222 84% 5%)',
+                                borderWidth: 2
+                            }
+                        }
+                    }
+                });
+
+                // Simulate chart updates
+                setInterval(() => {
+                    const lastValue = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
+                    const change = (Math.random() - 0.5) * 1000;
+                    const newValue = lastValue + change;
+                    
+                    chart.data.datasets[0].data.push(newValue);
+                    chart.data.labels.push(new Date().toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                    }));
+                    
+                    if (chart.data.datasets[0].data.length > 20) {
+                        chart.data.datasets[0].data.shift();
+                        chart.data.labels.shift();
+                    }
+                    
+                    chart.update('none');
+                }, 10000);
+            }
+
+            // Initialize all features when DOM is loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                simulateRealTimeUpdates();
+                updateTimestamps();
+                initializeChart();
+                
+                console.log('🚀 AI Trading Platform Dashboard Initialized');
+                console.log('📊 Real-time simulation active');
+                console.log('🔗 WebSocket connections ready for implementation');
+            });
+
+            // Global application state (for development)
+            window.TradingPlatform = {
+                version: '1.0.0',
+                features: {
+                    realTimeData: true,
+                    aiSignals: true,
+                    newsAnalysis: true,
+                    portfolioTracking: true
+                },
+                status: 'operational'
+            };
+        })();
+    </script>
+</body>
+</html>
