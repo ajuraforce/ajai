@@ -2,11 +2,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 export default function NotFound() {
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-md mx-4">
           <CardContent className="pt-6 text-center">
@@ -26,6 +26,6 @@ export default function NotFound() {
           </CardContent>
         </Card>
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
