@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Globe, TrendingUp, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 export default function NewsFeed() {
   const { data: articles = [], isLoading, refetch, isRefetching } = useQuery({
@@ -38,7 +38,7 @@ export default function NewsFeed() {
 
   if (isLoading) {
     return (
-      <PageLayout>
+      <NewPageLayout>
         <div className="container mx-auto space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Live News Feed</h1>
@@ -55,12 +55,12 @@ export default function NewsFeed() {
             ))}
           </div>
         </div>
-      </PageLayout>
+      </NewPageLayout>
     );
   }
 
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto space-y-4 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -195,6 +195,6 @@ export default function NewsFeed() {
         )}
       </div>
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
