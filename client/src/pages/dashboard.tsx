@@ -10,6 +10,8 @@ import Watchlist from "@/components/dashboard/watchlist";
 import LiveMarketData from "@/components/dashboard/live-market-data";
 import SignalAccuracyPanel from "@/components/dashboard/signal-accuracy-panel";
 import RiskManagementPanel from "@/components/dashboard/risk-management-panel";
+import SocialSentiment from "@/components/dashboard/social-sentiment";
+import FusionIntelligence from "@/components/dashboard/fusion-intelligence";
 import { connectWebSocket } from "@/services/websocket";
 import { NewPageLayout } from "@/components/ui/new-navigation";
 
@@ -33,6 +35,12 @@ export default function Dashboard() {
             <Watchlist />
           </div>
         </div>
+
+        {/* Social Sentiment Intelligence */}
+        <SocialSentiment />
+
+        {/* AI Fusion Intelligence - Angel Broking + Telegram + Social + Technical */}
+        <FusionIntelligence />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <div className="xl:col-span-2">
