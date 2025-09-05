@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Filter, Globe, TrendingUp, Calendar, ExternalLink, Newspaper } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 export default function NewsCenter() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,7 +95,8 @@ export default function NewsCenter() {
   }
 
   return (
-    <PageLayout>
+    <ProtectedRoute>
+      <NewPageLayout>
       <div className="container mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-2">
@@ -275,6 +277,7 @@ export default function NewsCenter() {
         )}
       </div>
       </div>
-    </PageLayout>
+    </NewPageLayout>
+    </ProtectedRoute>
   );
 }
