@@ -12,7 +12,7 @@ import { Settings, Shield, Bell, Palette, Clock, Save, User, AlertTriangle } fro
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -73,7 +73,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -336,6 +336,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
