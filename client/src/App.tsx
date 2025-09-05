@@ -15,6 +15,7 @@ import NewsFeed from "@/pages/newsfeed";
 import Settings from "@/pages/settings";
 import NewsPage from "@/pages/news";
 import NotFound from "@/pages/not-found";
+import TestDashboard from "@/pages/test-dashboard";
 
 function Router() {
   const { isAuthenticated, isLoading, login } = useAuth();
