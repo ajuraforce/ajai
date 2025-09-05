@@ -11,7 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useNotificationHelpers } from "@/components/ui/notification-system";
 import TradeConfirmationModal from "@/components/ui/trade-confirmation-modal";
 
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 export default function Signals() {
   const [activeOnly, setActiveOnly] = useState(true);
@@ -47,13 +47,14 @@ export default function Signals() {
     },
   });
 
+  const signalsArray = Array.isArray(signals) ? signals : [];
   const filteredSignals = activeOnly 
-    ? signals.filter((signal: any) => signal.isActive !== false)
-    : signals;
+    ? signalsArray.filter((signal: any) => signal.isActive !== false)
+    : signalsArray;
 
   if (isLoading) {
     return (
-      <PageLayout>
+      <NewPageLayout>
         <div className="container mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">Trading Signals</h1>
@@ -69,12 +70,12 @@ export default function Signals() {
             ))}
           </div>
         </div>
-      </PageLayout>
+      </NewPageLayout>
     );
   }
 
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -306,6 +307,6 @@ export default function Signals() {
         trade={lastTrade}
       />
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
