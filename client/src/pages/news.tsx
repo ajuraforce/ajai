@@ -17,7 +17,7 @@ import {
   Newspaper 
 } from 'lucide-react';
 import { useNotificationHelpers } from '@/components/ui/notification-system';
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 interface NewsArticle {
   id: string;
@@ -95,7 +95,7 @@ export default function NewsPage() {
   };
 
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -277,6 +277,6 @@ export default function NewsPage() {
           </div>
         )}
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
