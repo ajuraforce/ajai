@@ -55,6 +55,23 @@ export interface IStorage {
   // Trade History
   getTrades(limit?: number): Promise<any[]>;
   createTrade(trade: any): Promise<any>;
+  
+  // Social Messages
+  getSocialMessages?(limit?: number): Promise<any[]>;
+  saveSocialMessages?(messages: any[]): Promise<void>;
+  
+  // Indian Market Data (Angel Broking)
+  getIndianMarketData?(): Promise<any[]>;
+  saveIndianMarketData?(data: any[]): Promise<void>;
+  getIndianStock?(symbol: string): Promise<any | undefined>;
+  
+  // Telegram Messages
+  getTelegramMessages?(limit?: number): Promise<any[]>;
+  saveTelegramMessages?(messages: any[]): Promise<void>;
+  
+  // Fusion Signals (Combined AI signals)
+  getFusionSignals?(limit?: number): Promise<any[]>;
+  saveFusionSignal?(signal: any): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -66,6 +83,10 @@ export class MemStorage implements IStorage {
   private marketData: Map<string, MarketData> = new Map();
   private riskMetrics: Map<string, RiskMetrics> = new Map();
   private trades: Map<string, any> = new Map();
+  private socialMessages: Map<string, any> = new Map();
+  private indianMarketData: Map<string, any> = new Map();
+  private telegramMessages: Map<string, any> = new Map();
+  private fusionSignals: Map<string, any> = new Map();
 
   constructor() {
     this.initializeDefaultData();
@@ -326,6 +347,72 @@ export class MemStorage implements IStorage {
     };
     this.trades.set(tradeRecord.id, tradeRecord);
     return tradeRecord;
+  }
+  
+  async getSocialMessages(limit: number = 100): Promise<any[]> {
+    const messages = Array.from(this.socialMessages.values())
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return limit ? messages.slice(0, limit) : messages;
+  }
+  
+  async saveSocialMessages(messages: any[]): Promise<void> {
+    messages.forEach(message => {
+      this.socialMessages.set(message.id, {
+        ...message,
+        timestamp: message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp)
+      });
+    });
+  }
+
+  // Indian Market Data methods
+  async getIndianMarketData(): Promise<any[]> {
+    return Array.from(this.indianMarketData.values())
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
+  async saveIndianMarketData(data: any[]): Promise<void> {
+    data.forEach(item => {
+      this.indianMarketData.set(item.symbol, {
+        ...item,
+        timestamp: item.timestamp instanceof Date ? item.timestamp : new Date(item.timestamp)
+      });
+    });
+  }
+
+  async getIndianStock(symbol: string): Promise<any | undefined> {
+    return this.indianMarketData.get(symbol);
+  }
+
+  // Telegram Messages methods
+  async getTelegramMessages(limit: number = 50): Promise<any[]> {
+    return Array.from(this.telegramMessages.values())
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit);
+  }
+
+  async saveTelegramMessages(messages: any[]): Promise<void> {
+    messages.forEach(message => {
+      this.telegramMessages.set(message.id, {
+        ...message,
+        timestamp: message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp)
+      });
+    });
+  }
+
+  // Fusion Signals methods
+  async getFusionSignals(limit: number = 20): Promise<any[]> {
+    return Array.from(this.fusionSignals.values())
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit);
+  }
+
+  async saveFusionSignal(signal: any): Promise<void> {
+    const id = signal.id || randomUUID();
+    this.fusionSignals.set(id, {
+      ...signal,
+      id,
+      timestamp: signal.timestamp instanceof Date ? signal.timestamp : new Date(signal.timestamp || Date.now())
+    });
   }
 }
 
