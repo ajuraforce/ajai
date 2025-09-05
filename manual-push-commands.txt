@@ -1,0 +1,43 @@
+# Manual GitHub Push Commands for AJAI Trading Platform
+# Copy and paste these commands one by one in your Replit Shell
+
+# 1. Initialize git if needed (skip if already done)
+git init
+git branch -M main
+
+# 2. Configure git user
+git config user.email "ajai-bot@example.com"
+git config user.name "AJAI Bot"
+
+# 3. Add remote origin (this uses your GitHub secrets automatically)
+git remote remove origin 2>/dev/null || true
+git remote add origin https://$GITHUB_TOKEN@github.com/$GITHUB_OWNER/$GITHUB_REPO.git
+
+# 4. Add all files
+git add .
+
+# 5. Commit with detailed message
+git commit -m "🚀 AJAI Trading Platform - Complete AI-Powered Trading System
+
+🔧 Features:
+- AI-powered trading signals with 85%+ confidence auto-execution
+- Real-time market data analysis and portfolio management  
+- News sentiment analysis and market impact predictions
+- Advanced risk management and position tracking
+- Interactive chat assistant (AJxAI) with trading insights
+- Comprehensive dashboard with live market indicators
+
+💻 Tech Stack:
+- Frontend: React + TypeScript + Tailwind CSS
+- Backend: Node.js + Express + PostgreSQL
+- AI: OpenAI API integration for market analysis
+- Real-time: WebSocket connections for live updates
+- Database: PostgreSQL with Drizzle ORM
+
+🚀 Ready for deployment and trading!"
+
+# 6. Push to GitHub
+git push -u origin main
+
+# Success! Your AJAI trading platform is now on GitHub
+# Visit: https://github.com/$GITHUB_OWNER/$GITHUB_REPO
