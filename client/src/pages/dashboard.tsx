@@ -11,7 +11,7 @@ import LiveMarketData from "@/components/dashboard/live-market-data";
 import SignalAccuracyPanel from "@/components/dashboard/signal-accuracy-panel";
 import RiskManagementPanel from "@/components/dashboard/risk-management-panel";
 import { connectWebSocket } from "@/services/websocket";
-import { PageLayout } from "@/components/ui/main-navigation";
+import { NewPageLayout } from "@/components/ui/new-navigation";
 
 export default function Dashboard() {
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <PageLayout>
+    <NewPageLayout>
       <div className="container mx-auto space-y-4 sm:space-y-6">
         <PortfolioOverview />
         
@@ -57,6 +57,6 @@ export default function Dashboard() {
           <PositionsTable />
         </div>
       </div>
-    </PageLayout>
+    </NewPageLayout>
   );
 }
